@@ -1,6 +1,7 @@
-const API_KEY = "AIzaSyDaQdeByiG105U2BqL5iWZ2zyk3Xp_F5tM";
+const API_KEY = "AIzaSyDaQdeByiG1O5U2BqL5iWZ2zyk3Xp_F5tM";
 
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
+
 const SYSTEM_PROMPT = `You are EduBot, a friendly and helpful college guide chatbot made for first-year students. You help students with questions about college life, academics, study tips, hostel, campus facilities, exam preparation, student clubs, and managing time and stress. Always reply in a warm, encouraging, and simple tone. Keep answers short and easy to understand.`;
 
 let chatHistory = [];
@@ -33,6 +34,11 @@ async function sendMessage() {
   btn.disabled = true;
   isWaiting = true;
 
+  chatHistory.push({
+    role: "user",
+    parts: [{ text: userText }]
+  });
+
   const chatWindow = document.getElementById("chatWindow");
   const typingDiv = document.createElement("div");
   typingDiv.classList.add("message", "bot-msg", "typing");
@@ -42,32 +48,34 @@ async function sendMessage() {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 
   try {
-    const response = await fetch("https://text.pollinations.ai/openai", {
+    const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "openai",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...chatHistory,
-          { role: "user", content: userText }
-        ]
+        system_instruction: {
+          parts: [{ text: SYSTEM_PROMPT }]
+        },
+        contents: chatHistory
       })
     });
 
     const data = await response.json();
+    console.log("Response:", data);
 
-    if (!data.choices || !data.choices[0]) {
+    if (data.error) {
       document.getElementById("typing").remove();
-      addMessage("bot", "⚠️ No response. Please try again.");
+      addMessage("bot", "⚠️ " + data.error.message);
       btn.disabled = false;
       isWaiting = false;
       return;
     }
 
-    const botReply = data.choices[0].message.content;
-    chatHistory.push({ role: "user", content: userText });
-    chatHistory.push({ role: "assistant", content: botReply });
+    const botReply = data.candidates[0].content.parts[0].text;
+
+    chatHistory.push({
+      role: "model",
+      parts: [{ text: botReply }]
+    });
 
     document.getElementById("typing").remove();
     addMessage("bot", botReply);
