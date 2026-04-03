@@ -1,3 +1,6 @@
+const API_KEY = "AIzaSyDaQdeByiG105U2BqL5iWZ2zyk3Xp_F5tM";
+
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
 const SYSTEM_PROMPT = `You are EduBot, a friendly and helpful college guide chatbot made for first-year students. You help students with questions about college life, academics, study tips, hostel, campus facilities, exam preparation, student clubs, and managing time and stress. Always reply in a warm, encouraging, and simple tone. Keep answers short and easy to understand.`;
 
 let chatHistory = [];
