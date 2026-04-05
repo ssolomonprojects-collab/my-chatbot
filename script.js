@@ -1,5 +1,5 @@
-const API_KEY = "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";
-const API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const API_KEY = "AIzaSyB1yCE286UK0vOu3YgH_6bhMujzQ7gBALI";
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
 let currentUser = null;
 let sessionId = "session_" + Date.now();
@@ -349,18 +349,18 @@ async function sendMessage() {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 
   try {
-    const response = await fetch(API_URL, {
+    // Build Gemini conversation history
+    const geminiMessages = chatHistory.map(msg => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }]
+    }));
+
+    const response = await fetch(API_URL + "?key=" + API_KEY, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + API_KEY
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...chatHistory
-        ]
+        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: geminiMessages
       })
     });
 
@@ -374,7 +374,7 @@ async function sendMessage() {
       return;
     }
 
-    if (!data.choices || !data.choices[0]) {
+    if (!data.candidates || !data.candidates[0]) {
       document.getElementById("typing").remove();
       addMessage("bot", "⚠️ No response. Please try again.");
       btn.disabled = false;
@@ -382,7 +382,7 @@ async function sendMessage() {
       return;
     }
 
-    const botReply = data.choices[0].message.content;
+    const botReply = data.candidates[0].content.parts[0].text;
     chatHistory.push({ role: "assistant", content: botReply });
     document.getElementById("typing").remove();
     addMessage("bot", botReply);
