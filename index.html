@@ -12,19 +12,30 @@
       <h1>🎓 EduBot</h1>
       <p>Your Personal College Guide Assistant</p>
     </div>
-    <div class="chat-window" id="chatWindow">
-      <!-- Messages will appear here -->
-    </div>
+    <div class="chat-window" id="chatWindow"></div>
     <div class="chat-input-area">
-      <input 
-        type="text" 
-        id="userInput" 
-        placeholder="Ask me anything about college life..."
-        autocomplete="off"
-      >
+      <input type="text" id="userInput" placeholder="Ask me anything about college life..." autocomplete="off">
       <button id="sendBtn" onclick="sendMessage()">Send</button>
     </div>
   </div>
-  <script type="module" src="script.js"></script>
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase Init -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmBjL9LzMsfhzGydqvrREMvGMZH7g6wKA",
+      authDomain: "edubot-chats.firebaseapp.com",
+      projectId: "edubot-chats",
+      storageBucket: "edubot-chats.firebasestorage.app",
+      messagingSenderId: "255827058341",
+      appId: "1:255827058341:web:7e54cbff0a25e025e9374c"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+  <script src="script.js"></script>
 </body>
 </html>
