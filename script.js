@@ -1,4 +1,4 @@
-const API_KEY = "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";
+const API_KEY = "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";
 const API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 let currentUser = null;
