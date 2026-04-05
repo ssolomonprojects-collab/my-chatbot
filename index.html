@@ -5,22 +5,116 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EduBot - College Guide</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    #loginScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #1e3a5f, #2563EB);
+      text-align: center;
+      padding: 20px;
+    }
+    #loginScreen h1 {
+      color: white;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    #loginScreen p {
+      color: #cce0ff;
+      font-size: 1.1rem;
+      margin-bottom: 40px;
+    }
+    #googleSignInBtn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      color: #333;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #googleSignInBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    #googleSignInBtn img {
+      width: 24px;
+      height: 24px;
+    }
+    #chatScreen { display: none; }
+    #userBar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #1e3a5f;
+      padding: 8px 16px;
+      color: white;
+      font-size: 0.85rem;
+    }
+    #userBar img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    #userInfo { display: flex; align-items: center; }
+    #signOutBtn {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      padding: 4px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    #signOutBtn:hover { background: rgba(255,255,255,0.3); }
+  </style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">
-      <h1>🎓 EduBot</h1>
-      <p>Your Personal College Guide Assistant</p>
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen">
+    <h1>🎓 EduBot</h1>
+    <p>Your Personal AI College Guide for Tamil Nadu Students</p>
+    <button id="googleSignInBtn">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Sign in with Google
+    </button>
+  </div>
+
+  <!-- CHAT SCREEN -->
+  <div id="chatScreen">
+    <div id="userBar">
+      <div id="userInfo">
+        <img id="userPhoto" src="" alt="">
+        <span id="userName"></span>
+      </div>
+      <button id="signOutBtn">Sign Out</button>
     </div>
-    <div class="chat-window" id="chatWindow"></div>
-    <div class="chat-input-area">
-      <input type="text" id="userInput" placeholder="Ask me anything about college life..." autocomplete="off">
-      <button id="sendBtn" onclick="sendMessage()">Send</button>
+    <div class="chat-container">
+      <div class="chat-header">
+        <h1>🎓 EduBot</h1>
+        <p>Your Personal College Guide Assistant</p>
+      </div>
+      <div class="chat-window" id="chatWindow"></div>
+      <div class="chat-input-area">
+        <input type="text" id="userInput" placeholder="Ask me anything about college life..." autocomplete="off">
+        <button id="sendBtn" onclick="sendMessage()">Send</button>
+      </div>
     </div>
   </div>
 
   <!-- Firebase CDN -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <!-- Firebase Init -->
@@ -36,6 +130,6 @@
     firebase.initializeApp(firebaseConfig);
   </script>
 
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
