@@ -1,5 +1,5 @@
-const API_KEY = "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";
-const API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const API_KEY = "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";
+const API_URL = "https://api-inference.huggingface.co/v1/chat/completions";
 
 let currentUser = null;
 let sessionId = "session_" + Date.now();
@@ -24,16 +24,10 @@ firebase.auth().onAuthStateChanged((user) => {
   if (user) {
     currentUser = user;
     sessionId = "session_" + user.uid + "_" + Date.now();
-
-    // Show chat, hide login
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("chatScreen").style.display = "block";
-
-    // Show user info
     document.getElementById("userName").textContent = user.displayName;
     document.getElementById("userPhoto").src = user.photoURL;
-
-    // Show welcome message
     const chatWindow = document.getElementById("chatWindow");
     if (chatWindow.children.length === 0) {
       const welcomeMsg = "👋 Hi " + user.displayName.split(" ")[0] + "! I am EduBot, your college guide assistant. Ask me anything about college life, exams, hostel, or student activities!";
@@ -349,18 +343,19 @@ async function sendMessage() {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 
   try {
-    // Build Gemini conversation history
-    const geminiMessages = chatHistory.map(msg => ({
-      role: msg.role === "assistant" ? "model" : "user",
-      parts: [{ text: msg.content }]
-    }));
-
-    const response = await fetch(API_URL + "?key=" + API_KEY, {
+    const response = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + API_KEY
+      },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: geminiMessages
+        model: "mistralai/Mistral-7B-Instruct-v0.3",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          ...chatHistory
+        ],
+        max_tokens: 1024
       })
     });
 
@@ -374,7 +369,7 @@ async function sendMessage() {
       return;
     }
 
-    if (!data.candidates || !data.candidates[0]) {
+    if (!data.choices || !data.choices[0]) {
       document.getElementById("typing").remove();
       addMessage("bot", "⚠️ No response. Please try again.");
       btn.disabled = false;
@@ -382,7 +377,7 @@ async function sendMessage() {
       return;
     }
 
-    const botReply = data.candidates[0].content.parts[0].text;
+    const botReply = data.choices[0].message.content;
     chatHistory.push({ role: "assistant", content: botReply });
     document.getElementById("typing").remove();
     addMessage("bot", botReply);
@@ -402,3 +397,11 @@ async function sendMessage() {
 document.getElementById("userInput").addEventListener("keydown", function (e) {
   if (e.key === "Enter") sendMessage();
 });
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("/my-chatbot/sw.js")
+      .then(function() { console.log("PWA ready!"); })
+      .catch(function(e) { console.log("SW error:", e); });
+  });
+}
