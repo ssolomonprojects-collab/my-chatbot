@@ -1,5 +1,5 @@
-const API_KEY = "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";
-const API_URL = "https://api-inference.huggingface.co/v1/chat/completions";
+const API_KEY = "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";
+const API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 let currentUser = null;
 let sessionId = "session_" + Date.now();
@@ -350,7 +350,7 @@ async function sendMessage() {
         "Authorization": "Bearer " + API_KEY
       },
       body: JSON.stringify({
-        model: "mistralai/Mistral-7B-Instruct-v0.3",
+        model: "llama-3.3-70b-versatile",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           ...chatHistory
