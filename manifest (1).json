@@ -1,0 +1,27 @@
+{
+  "name": "EduBot - College Guide",
+  "short_name": "EduBot",
+  "description": "Your AI-powered bilingual college guide assistant for Tamil Nadu students",
+  "start_url": "/my-chatbot/",
+  "scope": "/my-chatbot/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#2563EB",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "lang": "en-IN"
+}
