@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduBot Admin Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e0e0e0; min-height: 100vh; }
+    #loginScreen {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    }
+    #loginScreen h1 { font-size: 2.5rem; color: #4fc3f7; margin-bottom: 8px; }
+    #loginScreen p { color: #90caf9; margin-bottom: 40px; font-size: 1rem; }
+    #loginBox {
+      background: rgba(255,255,255,0.05); padding: 40px;
+      border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
+      width: 340px; text-align: center;
+    }
+    #loginBox h2 { color: #fff; margin-bottom: 24px; font-size: 1.3rem; }
+    #passwordInput {
+      width: 100%; padding: 12px 16px; border-radius: 8px;
+      border: 1px solid #333; background: #1e1e2e; color: white;
+      font-size: 1rem; margin-bottom: 16px; outline: none;
+    }
+    #passwordInput:focus { border-color: #4fc3f7; }
+    #loginBtn {
+      width: 100%; padding: 12px; background: #2563EB; color: white;
+      border: none; border-radius: 8px; font-size: 1rem;
+      font-weight: 600; cursor: pointer;
+    }
+    #loginBtn:hover { background: #1d4ed8; }
+    #loginError { color: #ef5350; margin-top: 12px; font-size: 0.9rem; display: none; }
+    #dashboard { display: none; }
+    .topbar {
+      background: #1a1a2e; padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #333;
+    }
+    .topbar h1 { color: #4fc3f7; font-size: 1.4rem; }
+    .topbar-right { display: flex; gap: 12px; }
+    #refreshBtn {
+      background: #2563EB; color: white; border: none;
+      padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 600;
+    }
+    #logoutBtn {
+      background: #333; color: #ccc; border: none;
+      padding: 8px 18px; border-radius: 8px; cursor: pointer;
+    }
+    .stats { display: flex; gap: 20px; padding: 24px; flex-wrap: wrap; }
+    .stat-card {
+      background: #1e1e2e; border-radius: 12px; padding: 20px 28px;
+      border: 1px solid #333; flex: 1; min-width: 150px; text-align: center;
+    }
+    .stat-card .number { font-size: 2.2rem; font-weight: 700; color: #4fc3f7; }
+    .stat-card .label { color: #888; font-size: 0.85rem; margin-top: 4px; }
+    .search-area { padding: 0 24px 16px; }
+    #searchInput {
+      width: 100%; max-width: 400px; padding: 10px 16px;
+      border-radius: 8px; border: 1px solid #333;
+      background: #1e1e2e; color: white; font-size: 0.95rem; outline: none;
+    }
+    #searchInput:focus { border-color: #4fc3f7; }
+    .table-area { padding: 0 24px 24px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      background: #1a1a2e; padding: 12px 16px; text-align: left;
+      color: #4fc3f7; font-size: 0.85rem; text-transform: uppercase;
+      border-bottom: 1px solid #333;
+    }
+    td { padding: 12px 16px; border-bottom: 1px solid #222; font-size: 0.9rem; }
+    tr:hover { background: rgba(255,255,255,0.03); }
+    .view-btn {
+      background: #2563EB; color: white; border: none;
+      padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600;
+    }
+    .badge {
+      background: #1e3a5f; color: #4fc3f7; padding: 3px 10px;
+      border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+    }
+    #modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); z-index: 100;
+      align-items: center; justify-content: center;
+    }
+    #modal.show { display: flex; }
+    .modal-box {
+      background: #1e1e2e; border-radius: 16px; border: 1px solid #333;
+      width: 90%; max-width: 600px; max-height: 80vh;
+      display: flex; flex-direction: column;
+    }
+    .modal-header {
+      padding: 16px 20px; border-bottom: 1px solid #333;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-header h3 { color: #4fc3f7; }
+    #closeModal { background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer; }
+    .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+    .chat-msg {
+      margin-bottom: 12px; padding: 10px 14px;
+      border-radius: 10px; max-width: 85%; font-size: 0.9rem; line-height: 1.5;
+    }
+    .chat-msg.user { background: #2563EB; color: white; margin-left: auto; text-align: right; }
+    .chat-msg.bot { background: #2a2a3e; color: #e0e0e0; }
+    .chat-msg .meta { font-size: 0.7rem; opacity: 0.6; margin-top: 4px; }
+    #loadingMsg { text-align: center; padding: 40px; color: #888; }
+    #noData { text-align: center; padding: 40px; color: #888; display: none; }
+  </style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <h1>🎓 EduBot</h1>
+  <p>Admin Dashboard</p>
+  <div id="loginBox">
+    <h2>🔐 Admin Login</h2>
+    <input type="password" id="passwordInput" placeholder="Enter admin password" />
+    <button id="loginBtn">Login</button>
+    <p id="loginError">❌ Wrong password! Try again.</p>
+  </div>
+</div>
+
+<div id="dashboard">
+  <div class="topbar">
+    <h1>🎓 EduBot Admin Dashboard</h1>
+    <div class="topbar-right">
+      <button id="refreshBtn">↻ Refresh</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat-card"><div class="number" id="totalUsers">-</div><div class="label">Total Users</div></div>
+    <div class="stat-card"><div class="number" id="totalSessions">-</div><div class="label">Total Sessions</div></div>
+    <div class="stat-card"><div class="number" id="totalMessages">-</div><div class="label">Total Messages</div></div>
+    <div class="stat-card"><div class="number" id="totalUserMessages">-</div><div class="label">User Messages</div></div>
+  </div>
+  <div class="search-area">
+    <input type="text" id="searchInput" placeholder="🔍 Search by name or email..." />
+  </div>
+  <div class="table-area">
+    <div id="loadingMsg">Loading conversations...</div>
+    <div id="noData">No conversations found.</div>
+    <table id="sessionsTable" style="display:none;">
+      <thead>
+        <tr>
+          <th>#</th><th>User Name</th><th>Email</th>
+          <th>Messages</th><th>Last Active</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modalTitle">Conversation</h3>
+      <button id="closeModal">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBmBjL9LzMsfhzGydqvrREMvGMZH7g6wKA",
+    authDomain: "edubot-chats.firebaseapp.com",
+    projectId: "edubot-chats",
+    storageBucket: "edubot-chats.firebasestorage.app",
+    messagingSenderId: "255827058341",
+    appId: "1:255827058341:web:7e54cbff0a25e025e9374c"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const ADMIN_PASSWORD = "Solo03102007@monprojects#@3";
+  let allSessions = {};
+
+  document.getElementById("loginBtn").addEventListener("click", () => {
+    const pwd = document.getElementById("passwordInput").value;
+    if (pwd === ADMIN_PASSWORD) {
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      loadData();
+    } else {
+      document.getElementById("loginError").style.display = "block";
+    }
+  });
+
+  document.getElementById("passwordInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("loginBtn").click();
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("passwordInput").value = "";
+  });
+
+  document.getElementById("refreshBtn").addEventListener("click", loadData);
+
+  async function loadData() {
+    document.getElementById("loadingMsg").style.display = "block";
+    document.getElementById("sessionsTable").style.display = "none";
+    document.getElementById("noData").style.display = "none";
+    allSessions = {};
+
+    try {
+      const snapshot = await db.collection("chats").orderBy("timestamp", "desc").get();
+      if (snapshot.empty) {
+        document.getElementById("loadingMsg").style.display = "none";
+        document.getElementById("noData").style.display = "block";
+        return;
+      }
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const sid = data.sessionId || "unknown";
+        if (!allSessions[sid]) {
+          allSessions[sid] = {
+            sessionId: sid,
+            userName: data.userName || "Unknown User",
+            userEmail: data.userEmail || "No email",
+            messages: [],
+            lastTimestamp: null
+          };
+        }
+        allSessions[sid].messages.push(data);
+        if (!allSessions[sid].lastTimestamp ||
+            (data.timestamp && data.timestamp.seconds > allSessions[sid].lastTimestamp)) {
+          allSessions[sid].lastTimestamp = data.timestamp ? data.timestamp.seconds : 0;
+        }
+      });
+      renderTable(Object.values(allSessions));
+    } catch (e) {
+      document.getElementById("loadingMsg").textContent = "Error: " + e.message;
+    }
+  }
+
+  function renderTable(sessions) {
+    const uniqueUsers = new Set(sessions.map(s => s.userEmail)).size;
+    const totalMessages = sessions.reduce((a, s) => a + s.messages.length, 0);
+    const userMessages = sessions.reduce((a, s) => a + s.messages.filter(m => m.role === "user").length, 0);
+
+    document.getElementById("totalUsers").textContent = uniqueUsers;
+    document.getElementById("totalSessions").textContent = sessions.length;
+    document.getElementById("totalMessages").textContent = totalMessages;
+    document.getElementById("totalUserMessages").textContent = userMessages;
+
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+
+    if (sessions.length === 0) {
+      document.getElementById("loadingMsg").style.display = "none";
+      document.getElementById("noData").style.display = "block";
+      return;
+    }
+
+    sessions.sort((a, b) => (b.lastTimestamp || 0) - (a.lastTimestamp || 0));
+
+    sessions.forEach((session, i) => {
+      const date = session.lastTimestamp
+        ? new Date(session.lastTimestamp * 1000).toLocaleString() : "Unknown";
+      const userMsgCount = session.messages.filter(m => m.role === "user").length;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i + 1}</td>
+        <td><strong>${session.userName}</strong></td>
+        <td style="color:#888;font-size:0.8rem;">${session.userEmail}</td>
+        <td><span class="badge">${session.messages.length} msgs (${userMsgCount} user)</span></td>
+        <td style="color:#888;font-size:0.8rem;">${date}</td>
+        <td><button class="view-btn" onclick="viewChat('${session.sessionId}')">View Chat</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById("loadingMsg").style.display = "none";
+    document.getElementById("sessionsTable").style.display = "table";
+  }
+
+  function viewChat(sessionId) {
+    const session = allSessions[sessionId];
+    if (!session) return;
+    document.getElementById("modalTitle").textContent = "💬 " + session.userName + " (" + session.userEmail + ")";
+    const body = document.getElementById("modalBody");
+    body.innerHTML = "";
+    const sorted = [...session.messages].sort((a, b) => {
+      return (a.timestamp ? a.timestamp.seconds : 0) - (b.timestamp ? b.timestamp.seconds : 0);
+    });
+    sorted.forEach(msg => {
+      const div = document.createElement("div");
+      div.classList.add("chat-msg", msg.role === "user" ? "user" : "bot");
+      const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString() : "";
+      div.innerHTML = `<div>${msg.message || ""}</div>
+        <div class="meta">${msg.role === "user" ? "👤 User" : "🤖 EduBot"} • ${time}</div>`;
+      body.appendChild(div);
+    });
+    document.getElementById("modal").classList.add("show");
+  }
+
+  document.getElementById("closeModal").addEventListener("click", () => {
+    document.getElementById("modal").classList.remove("show");
+  });
+
+  document.getElementById("modal").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("modal"))
+      document.getElementById("modal").classList.remove("show");
+  });
+
+  document.getElementById("searchInput").addEventListener("input", (e) => {
+    const query = e.target.value.toLowerCase();
+    const filtered = Object.values(allSessions).filter(s =>
+      s.userName.toLowerCase().includes(query) || s.userEmail.toLowerCase().includes(query)
+    );
+    renderTable(filtered);
+  });
+</script>
+</body>
+</html>
