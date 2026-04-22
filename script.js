@@ -1,6 +1,5 @@
-const API_KEY = "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";
-const API_URL = "https://api.groq.com/openai/v1/chat/completions";
-
+const API_KEY = "AIzaSyCZ_Oldf83tpMw_o4uTFRPeQ5TuH5wCUow";
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
 let currentUser = null;
 let sessionId = "session_" + Date.now();
 
