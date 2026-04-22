@@ -1,5 +1,6 @@
 const API_KEY = "AIzaSyCZ_Oldf83tpMw_o4uTFRPeQ5TuH5wCUow";
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
+
 let currentUser = null;
 let sessionId = "session_" + Date.now();
 
@@ -115,7 +116,7 @@ Casual address:
 
 Expressions:
 - aama da — yes da
-- illada — no da  
+- illada — no da
 - seri da — okay da / alright da
 - adei — expression of surprise
 - yenna achu da — what happened da
@@ -342,23 +343,22 @@ async function sendMessage() {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 
   try {
+    const geminiContents = chatHistory.map(msg => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }]
+    }));
+
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + API_KEY
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...chatHistory
-        ],
-        max_tokens: 1024
+        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: geminiContents
       })
     });
 
     const data = await response.json();
+    console.log("Gemini response:", data);
 
     if (data.error) {
       document.getElementById("typing").remove();
@@ -368,7 +368,7 @@ async function sendMessage() {
       return;
     }
 
-    if (!data.choices || !data.choices[0]) {
+    if (!data.candidates || !data.candidates[0]) {
       document.getElementById("typing").remove();
       addMessage("bot", "⚠️ No response. Please try again.");
       btn.disabled = false;
@@ -376,7 +376,7 @@ async function sendMessage() {
       return;
     }
 
-    const botReply = data.choices[0].message.content;
+    const botReply = data.candidates[0].content.parts[0].text;
     chatHistory.push({ role: "assistant", content: botReply });
     document.getElementById("typing").remove();
     addMessage("bot", botReply);
